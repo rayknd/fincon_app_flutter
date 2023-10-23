@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "480586147920",
+    "project_id": "fincon-517fd",
+    "storage_bucket": "fincon-517fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480586147920:android:a9a4d22e5f234f1eaf4955",
+        "android_client_info": {
+          "package_name": "com.example.fincon_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2I5lA2Qnqd6KrpDYuHQu7Mm8oz-phncc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
