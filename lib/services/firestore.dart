@@ -39,7 +39,7 @@ class FirestoreService {
 
   Stream<QuerySnapshot> getExpenseStream() {
     final expensesStream =
-        _expenses.where('expense_dtmExclusion', isEqualTo: "").snapshots();
+        _expenses.where('expense_dtmExclusion', isNull: true).snapshots();
     return expensesStream;
   }
 
