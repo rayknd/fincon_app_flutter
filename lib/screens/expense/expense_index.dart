@@ -81,11 +81,11 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                       if (docID != null) {
                         //Atualiza a despesa
                         FirestoreService().updateExpense(
-                            docID, Expense(_name.text, "", _value.text, _date, isRecurrent, "", "1"));
+                            docID, Expense(_name.text, "", _value.text, _date, isRecurrent, null, "1", null));
                       } else {
                         //Adiciona nova despesa
                         FirestoreService().addExpense(
-                            Expense(_name.text, "", _value.text, _date, isRecurrent, "", "1"));
+                            Expense(_name.text, "", _value.text, _date, isRecurrent, null, "1", null));
                       }
 
                       //Limpa input
@@ -152,8 +152,9 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
 
                   Map<String, dynamic> data =
                       document.data() as Map<String, dynamic>;
+                  Expense expense = Expense.fromJson(data);
 
-                  String expenseName = data['expense_name'];
+                  bool enpenseDtmPayment = expense.dtmPayment != null;
 
                   return Card(
                       child: ListTile(
@@ -165,10 +166,27 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                             icon: const Icon(Icons.settings)),
                         IconButton(
                             onPressed: () => confirmDelete(docID: docID),
-                            icon: const Icon(Icons.delete))
+                            icon: const Icon(Icons.delete)),
+                        Switch(value: enpenseDtmPayment, onChanged: (bool? value) {
+
+                          setState(() {
+                            enpenseDtmPayment = value!;
+                          });
+
+                          if(enpenseDtmPayment) {
+                            expense.dtmPayment = DateTime.now();
+                          }
+
+                          if(!enpenseDtmPayment) {
+                            expense.dtmPayment = null;
+                          }
+
+                          FirestoreService().updateExpense(docID, expense);
+                        },)
                       ],
                     ),
-                    leading: Text(expenseName),
+                    leading: Text(expense.name),
+                    
                   ));
                 });
           } else {
