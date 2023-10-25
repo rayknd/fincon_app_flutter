@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fincon_app/services/firestore.dart';
+import 'package:fincon_app/services/firestoreService.dart';
 import 'package:flutter/material.dart';
 
 class CategoryIndexPage extends StatefulWidget {
