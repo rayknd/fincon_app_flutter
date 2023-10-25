@@ -1,5 +1,6 @@
 import 'package:fincon_app/screens/auth/login.dart';
 import 'package:fincon_app/screens/category/category_index.dart';
+import 'package:fincon_app/screens/expense/expense_index.dart';
 import 'package:fincon_app/screens/home/home_content.dart';
 import 'package:fincon_app/services/firebaseAuthService.dart';
 import 'package:fincon_app/services/firestoreService.dart';
@@ -17,10 +18,8 @@ class _HomePageState extends State<HomePage> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeContentPage(),
-    const Text(
-      'Index 1: Business',
-    ),
-    CategoryIndexPage(),
+    const ExpenseIndexPage(),
+    const CategoryIndexPage(),
   ];
 
   void _onItemTapped(int index) {
