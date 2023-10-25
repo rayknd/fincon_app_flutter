@@ -14,6 +14,10 @@ class ExpenseIndexPage extends StatefulWidget {
 class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _value = TextEditingController();
+  Stream<QuerySnapshot> streamCategories =
+      FirestoreService().getCategoryStream();
+
+  String? _selectedCategory = "";
   DateTime _date = DateTime.now();
   bool isRecurrent = false;
 
@@ -46,9 +50,46 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                       controller: _name,
                     ),
                     TextField(
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       decoration:
                           const InputDecoration(hintText: "Valor do Gasto"),
                       controller: _value,
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: streamCategories, 
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (!snapshot.hasData) {
+                            return const CircularProgressIndicator(); 
+                          }
+
+                          List categories = snapshot.data!.docs
+                              .map((doc) => doc['category_name'])
+                              .toList();
+
+                          if(_selectedCategory == ""){
+                            _selectedCategory = categories[0];
+                          }
+
+                          return DropdownButton<String>(
+                            value: _selectedCategory,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedCategory = newValue;
+                              });
+                            },
+                            items: categories.map((dynamic category) {
+                              return DropdownMenuItem<String>(
+                                value: category.toString(),
+                                child: Text(category.toString()),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
                     ),
                     Row(
                       children: <Widget>[
@@ -63,6 +104,7 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                       ],
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start, 
                       children: <Widget>[
                         Checkbox(
                           value: isRecurrent,
@@ -81,16 +123,16 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                   ElevatedButton(
                       onPressed: () {
                         if (docID != null) {
-                          //Atualiza a despesa
+                          
                           FirestoreService().updateExpense(
                               docID,
-                              Expense(_name.text, "", _value.text, _date,
+                              Expense(_name.text, _selectedCategory!, _value.text, _date,
                                   isRecurrent, null, "1", null));
                         } else {
-                          //Adiciona nova despesa
+                          
                           FirestoreService().addExpense(Expense(
                               _name.text,
-                              "",
+                              _selectedCategory!,
                               _value.text,
                               _date,
                               isRecurrent,
@@ -99,13 +141,13 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                               null));
                         }
 
-                        //Limpa input
+                        
                         _name.clear();
                         _value.clear();
                         _date = DateTime.now();
                         isRecurrent = false;
 
-                        //Fecha dialog
+                        
                         Navigator.pop(context);
                       },
                       child: const Text("Adicionar"))
@@ -199,7 +241,13 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                         )
                       ],
                     ),
-                    leading: Text(expense.name),
+                    title: Text(expense.name),
+                    subtitle: Text(
+                      expense.value,
+                      style: const TextStyle(
+                        color: Colors.green,
+                      ),
+                    ),
                   ));
                 });
           } else {
