@@ -17,7 +17,7 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
   DateTime _date = DateTime.now();
   bool isRecurrent = false;
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext context, StateSetter setState) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _date,
@@ -34,72 +34,84 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
   void openExpenseBox({String? docID}) {
     showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextField(
-                    decoration:
-                        const InputDecoration(hintText: "Nome do gasto"),
-                    controller: _name,
-                  ),
-                  TextField(
-                    decoration:
-                        const InputDecoration(hintText: "Valor do Gasto"),
-                    controller: _value,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      const Text('Data: '),
-                      Text(formatDate(_date, [dd, '/', mm, '/', yyyy])),
-                      IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        onPressed: () {
-                          _selectDate(context);
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                        value: isRecurrent,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            isRecurrent = value!;
-                          });
-                        },
-                      ),
-                      const Text('Recorrente'),
-                    ],
-                  ),
+        builder: (BuildContext context) => StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextField(
+                      decoration:
+                          const InputDecoration(hintText: "Nome do gasto"),
+                      controller: _name,
+                    ),
+                    TextField(
+                      decoration:
+                          const InputDecoration(hintText: "Valor do Gasto"),
+                      controller: _value,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        const Text('Data: '),
+                        Text(formatDate(_date, [dd, '/', mm, '/', yyyy])),
+                        IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () {
+                            _selectDate(context, setState);
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Checkbox(
+                          value: isRecurrent,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isRecurrent = value!;
+                            });
+                          },
+                        ),
+                        const Text('Recorrente'),
+                      ],
+                    ),
+                  ],
+                ),
+                actions: [
+                  ElevatedButton(
+                      onPressed: () {
+                        if (docID != null) {
+                          //Atualiza a despesa
+                          FirestoreService().updateExpense(
+                              docID,
+                              Expense(_name.text, "", _value.text, _date,
+                                  isRecurrent, null, "1", null));
+                        } else {
+                          //Adiciona nova despesa
+                          FirestoreService().addExpense(Expense(
+                              _name.text,
+                              "",
+                              _value.text,
+                              _date,
+                              isRecurrent,
+                              null,
+                              "1",
+                              null));
+                        }
+
+                        //Limpa input
+                        _name.clear();
+                        _value.clear();
+                        _date = DateTime.now();
+                        isRecurrent = false;
+
+                        //Fecha dialog
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Adicionar"))
                 ],
-              ),
-              actions: [
-                ElevatedButton(
-                    onPressed: () {
-                      if (docID != null) {
-                        //Atualiza a despesa
-                        FirestoreService().updateExpense(
-                            docID, Expense(_name.text, "", _value.text, _date, isRecurrent, null, "1", null));
-                      } else {
-                        //Adiciona nova despesa
-                        FirestoreService().addExpense(
-                            Expense(_name.text, "", _value.text, _date, isRecurrent, null, "1", null));
-                      }
-
-                      //Limpa input
-                      _name.clear();
-                      _value.clear();
-                      _date = DateTime.now();
-                      isRecurrent = false;
-
-                      //Fecha dialog
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Adicionar"))
-              ],
-            ));
+              );
+            }));
   }
 
   void confirmDelete({String? docID}) {
@@ -167,26 +179,27 @@ class _ExpenseIndexPageState extends State<ExpenseIndexPage> {
                         IconButton(
                             onPressed: () => confirmDelete(docID: docID),
                             icon: const Icon(Icons.delete)),
-                        Switch(value: enpenseDtmPayment, onChanged: (bool? value) {
+                        Switch(
+                          value: enpenseDtmPayment,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              enpenseDtmPayment = value!;
+                            });
 
-                          setState(() {
-                            enpenseDtmPayment = value!;
-                          });
+                            if (enpenseDtmPayment) {
+                              expense.dtmPayment = DateTime.now();
+                            }
 
-                          if(enpenseDtmPayment) {
-                            expense.dtmPayment = DateTime.now();
-                          }
+                            if (!enpenseDtmPayment) {
+                              expense.dtmPayment = null;
+                            }
 
-                          if(!enpenseDtmPayment) {
-                            expense.dtmPayment = null;
-                          }
-
-                          FirestoreService().updateExpense(docID, expense);
-                        },)
+                            FirestoreService().updateExpense(docID, expense);
+                          },
+                        )
                       ],
                     ),
                     leading: Text(expense.name),
-                    
                   ));
                 });
           } else {
