@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fincon_app/services/firebaseAuthService.dart';
 import 'package:fincon_app/services/firestoreService.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ class CategoryIndexPage extends StatefulWidget {
 
 class _CategoryIndexPageState extends State<CategoryIndexPage> {
   final TextEditingController textController = TextEditingController();
+  String userId = FirebaseAuthService().instanceFB.currentUser!.uid;
 
   void openCategoryBox({String? docID}) {
     showDialog(
@@ -30,7 +32,8 @@ class _CategoryIndexPageState extends State<CategoryIndexPage> {
                             .updateCategory(docID, textController.text);
                       } else {
                         //Adiciona nova categoria
-                        FirestoreService().addCategory(textController.text);
+                        FirestoreService()
+                            .addCategory(textController.text, userId);
                       }
 
                       //Limpa input
@@ -81,7 +84,7 @@ class _CategoryIndexPageState extends State<CategoryIndexPage> {
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirestoreService().getCategoryStream(),
+        stream: FirestoreService().getCategoryStream(userId),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List categoriesList = snapshot.data!.docs;

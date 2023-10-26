@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.payments),
-                label: 'Gastos fixos',
+                label: 'Meus Gastos',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.style),

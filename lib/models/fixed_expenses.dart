@@ -26,12 +26,12 @@ class Expense {
 
   factory Expense.fromJson(Map<String, dynamic> json) {
     DateTime? dtmExclusion;
-    if(json["expense_dtmExclusion"] is Timestamp){
+    if (json["expense_dtmExclusion"] is Timestamp) {
       dtmExclusion = (json["expense_dtmExclusion"] as Timestamp).toDate();
     }
 
     DateTime? dtmPayment;
-    if(json["expense_dtmPayment"] is Timestamp){
+    if (json["expense_dtmPayment"] is Timestamp) {
       dtmPayment = (json["expense_dtmPayment"] as Timestamp).toDate();
     }
 

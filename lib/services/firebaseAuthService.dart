@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fincon_app/models/user_complement.dart';
 import 'package:fincon_app/services/firestoreService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +13,6 @@ class FirebaseAuthService {
   //create account with e-mail and password
   Future<void> createAccountWithEmailAndPwd(
       name, income, email, password) async {
-    print("Register");
     final credential = await instanceFB.createUserWithEmailAndPassword(
       email: email,
       password: password,
