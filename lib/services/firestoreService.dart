@@ -26,7 +26,6 @@ class FirestoreService {
   Stream<QuerySnapshot> getCategoryStream(String userId) {
     final categoriesStream = _categories
         .where('category_userId', isEqualTo: userId)
-        .orderBy('category_name', descending: false)
         .snapshots();
     return categoriesStream;
   }
